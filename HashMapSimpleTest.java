@@ -1,16 +1,18 @@
+package pack;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 
 
-public class HashTableSimpleTest {
+public class HashMapSimpleTest {
 
-    private HashTableSimple<String, Integer> myHash;
+    private HashMapSimple<String, Integer> myHash;
 
     @Before
     public void before() throws Exception {
-        myHash = new HashTableSimple<>();
+        myHash = new HashMapSimple<>();
     }
 
     @Test
