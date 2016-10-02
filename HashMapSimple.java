@@ -2,24 +2,42 @@ package pack;
 
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 
 public class HashMapSimple<K, V> {
+    static final int DEFAULT_INITIAL_CAPACITY = 101;
+    static final int DEFAULT_INITIAL_PRIME = 107;
+
     private LinkedList<Entry<K, V>>[] arrLinkList;
     private int size = 0;
-    /**
-     * The capacity should be a prime number in order to avoid extra collisions
-     */
-    private final int ARRAY_CAPACITY_DEFAULT = 101;
 
-    HashMapSimple() {
-        arrLinkList = new LinkedList[ARRAY_CAPACITY_DEFAULT];
+    private int capacity;
+    private int primeNumber;
+
+    private int scale;
+    private int shift;
+
+    /**
+     *
+     * @param capacity the capacity should be a prime number in order to avoid extra collisions
+     * @param primeNumber the prime number must be superior to the capacity
+     */
+    HashMapSimple(int capacity, int primeNumber) {
+        arrLinkList = new LinkedList[capacity];
+        this.primeNumber = primeNumber;
+        this.capacity = capacity;
+        Random rand = new Random();
+        scale = rand.nextInt(primeNumber - 1) + 1;
+        shift = rand.nextInt(primeNumber);
     }
 
     HashMapSimple(int capacity) {
-        arrLinkList = new LinkedList[capacity];
-
+        this(capacity, DEFAULT_INITIAL_PRIME);
     }
 
+    HashMapSimple() {
+        this(DEFAULT_INITIAL_CAPACITY);
+    }
     /**
      * Consisting of two portions :
      * - A hash code that maps a key k to an integer
@@ -30,7 +48,7 @@ public class HashMapSimple<K, V> {
      * @return
      */
     private int hashFunction(K key) {
-        return key.hashCode() % arrLinkList.length - 1;
+        return (Math.abs(key.hashCode() * scale +  shift) % primeNumber) % capacity;
     }
 
     public void put(K key, V value) {
@@ -64,6 +82,23 @@ public class HashMapSimple<K, V> {
 
     public int size() {
         return size;
+    }
+
+    public boolean remove(K key) {
+        int hashResult = hashFunction(key);
+        int listSize = arrLinkList[hashFunction(key)].size();
+
+        if (arrLinkList[hashResult] == null) {
+            return false;
+        }
+
+        for (int i = 0; i < listSize; i++) {
+            if (arrLinkList[hashResult].get(i).getKey() == key) {
+                arrLinkList[hashResult].remove(i);
+                return true;
+            }
+        }
+        return false;
     }
 
     class Entry<K,V> implements Map.Entry<K,V> {
